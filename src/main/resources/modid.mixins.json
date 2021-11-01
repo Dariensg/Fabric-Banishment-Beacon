@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.mrjoshuat.banishmentbeacon.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "BeaconBlockEntityMixin",
+    "SpawnHelperMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
