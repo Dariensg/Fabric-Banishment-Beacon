@@ -1,5 +1,7 @@
 package com.mrjoshuat.banishmentbeacon.config;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.mrjoshuat.banishmentbeacon.ModInit;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -8,22 +10,20 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class BanishmentConfig {
     protected final File file;
     public static final BanishmentConfig INSTANCE = new BanishmentConfig(FabricLoader.getInstance().getConfigDir().resolve(ModInit.ModID + ".properties").toFile());
     public static final BanishmentProperties Properties = new BanishmentProperties();
 
-    private static final List<BlockPos> beaconCacheLocations = new ArrayList<>();
+    private static final BiMap<BlockPos, Box> beaconCacheLocations = HashBiMap.create();
 
     public BanishmentConfig(File file) {
         this.file = file;
@@ -43,7 +43,7 @@ public class BanishmentConfig {
     }
 
     public void save() {
-
+        // TODO
     }
 
     private void fromProperties(FileReader reader) {
@@ -86,25 +86,44 @@ public class BanishmentConfig {
         }
     }
 
-    public boolean isPosWithinSpawnProofArea(BlockPos pos) {
-        return beaconCacheLocations.stream().anyMatch(cachePosition -> {
-            var distance = cachePosition.getManhattanDistance(new Vec3i(pos.getX(), pos.getY(), pos.getZ()));
-            return distance < Properties.Range;
+    public boolean isPosWithinSpawnProofArea(@NotNull BlockPos pos) {
+        var vec = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+        return beaconCacheLocations.values().stream().anyMatch(beaconPox -> {
+           return beaconPox.contains(vec);
         });
     }
 
-    public void addCachedBeacon(BlockPos pos) {
-        if (!beaconCacheLocations.contains(pos)) {
+    public boolean addCachedBeacon(@NotNull BlockPos pos) {
+        if (!beaconCacheLocations.containsKey(pos)) {
             ModInit.LOGGER.info("Banishment beacon cache added at " + pos);
-            beaconCacheLocations.add(pos);
+            try {
+                beaconCacheLocations.put(pos, createBoxBoundary(pos));
+                return true;
+            } catch (Exception ex) {
+                ModInit.LOGGER.error("Failed to add cached beacon at " + pos);
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public void removeCachedBeacon(@NotNull BlockPos pos) {
+        if (beaconCacheLocations.containsKey(pos)) {
+            ModInit.LOGGER.info("Banishment beacon cache removed at " + pos);
+            try {
+                beaconCacheLocations.remove(pos);
+            } catch (Exception ex) {
+                ModInit.LOGGER.error("Failed to remove cached beacon at " + pos);
+            }
         }
     }
 
-    public void removeCachedBeacon(BlockPos pos) {
-        if (beaconCacheLocations.contains(pos)) {
-            ModInit.LOGGER.info("Banishment beacon cache removed at " + pos);
-            beaconCacheLocations.remove(pos);
-        }
+    public Box getCachedBeaconBox(@NotNull BlockPos pos) { return beaconCacheLocations.get(pos); }
+
+    public boolean isCachedBeacon(@NotNull BlockPos pos) { return beaconCacheLocations.containsKey(pos); }
+
+    private Box createBoxBoundary(BlockPos pos) {
+        return new Box(pos).expand(BanishmentConfig.Properties.Range);
     }
 
     public static class BanishmentProperties {

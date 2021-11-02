@@ -22,20 +22,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class SpawnHelperMixin {
     @Inject(
         at = @At("HEAD"),
-        method = "canSpawn(Lnet/minecraft/entity/SpawnRestriction$Location;Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/EntityType;)Z",
-        cancellable = true
-    )
-    private static void canSpawn(SpawnRestriction.Location location, WorldView world, BlockPos pos, EntityType<?> entityType, CallbackInfoReturnable<Boolean> info) {
-        BeaconBlockEntityHandler.handleCanSpawn(pos, info);
-    }
-
-    @Inject(
-        at = @At("HEAD"),
         method = "canSpawn(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/SpawnGroup;Lnet/minecraft/world/gen/StructureAccessor;Lnet/minecraft/world/gen/chunk/ChunkGenerator;Lnet/minecraft/world/biome/SpawnSettings$SpawnEntry;Lnet/minecraft/util/math/BlockPos$Mutable;D)Z",
         cancellable = true
     )
     private static void canSpawn(ServerWorld world, SpawnGroup group, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator,
                                  SpawnSettings.SpawnEntry spawnEntry, BlockPos.Mutable pos, double squaredDistance, CallbackInfoReturnable<Boolean> info) {
-        BeaconBlockEntityHandler.handleCanSpawn(pos, info);
+        BeaconBlockEntityHandler.handleCanSpawn(world, pos, info);
     }
 }
