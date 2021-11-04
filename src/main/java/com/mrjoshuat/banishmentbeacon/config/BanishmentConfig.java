@@ -16,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class BanishmentConfig {
@@ -32,6 +34,8 @@ public class BanishmentConfig {
     public void load() {
         if (!file.exists()) {
             ModInit.LOGGER.error("Could not find properties config file at " + file.getAbsolutePath());
+            ModInit.LOGGER.info("Writing default properties file to " + file.getAbsolutePath());
+            save();
             return;
         }
 
@@ -43,7 +47,12 @@ public class BanishmentConfig {
     }
 
     public void save() {
-        // TODO
+        try (FileWriter writer = new FileWriter(file)) {
+            toProperties(writer);
+            writer.flush();
+        } catch (Exception ex) {
+            ModInit.LOGGER.error("Could not load properties config from file " + file.getAbsolutePath(), ex);
+        }
     }
 
     private void fromProperties(FileReader reader) {
@@ -84,6 +93,15 @@ public class BanishmentConfig {
         catch (Exception ex) {
             ModInit.LOGGER.error("Could not read config from file", ex);
         }
+    }
+
+    private void toProperties(FileWriter writer) throws IOException {
+        Properties prop = new Properties();
+        prop.setProperty("block", Properties.IndicatorBlock.getLootTableId().toString());
+        prop.setProperty("shape", Properties.IndicatorShape.name);
+        prop.setProperty("minTier", String.valueOf(Properties.MinTier));
+        prop.setProperty("range", String.valueOf(Properties.Range));
+        prop.store(writer, "");
     }
 
     public boolean isPosWithinSpawnProofArea(@NotNull BlockPos pos) {
