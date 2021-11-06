@@ -1,5 +1,6 @@
 package com.mrjoshuat.banishmentbeacon.config;
 
+import com.google.common.base.Enums;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.mrjoshuat.banishmentbeacon.ModInit;
@@ -7,6 +8,8 @@ import com.mrjoshuat.banishmentbeacon.ModInit;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -41,6 +44,8 @@ public class BanishmentConfig {
 
         try (FileReader reader = new FileReader(file)) {
             fromProperties(reader);
+            // save back so any new properties get merged in
+            save();
         } catch (Exception ex) {
             ModInit.LOGGER.error("Could not load properties config from file " + file.getAbsolutePath(), ex);
         }
@@ -64,6 +69,9 @@ public class BanishmentConfig {
             var shapeStr = prop.getProperty("shape", "UNDER_BEACON");
             var minTier = prop.getProperty("minTier", "4");
             var range = prop.getProperty("range", "100");
+            var removeOnlyEntities = prop.getProperty("removeOnlyEntities", "");
+            var removeOnlySpawnGroups = prop.getProperty("removeOnlySpawnGroups", "MONSTER");
+            var produceThunderOnBeaconActivation = prop.getProperty("produceThunderOnBeaconActivation", String.valueOf(false));
 
             var blockIdentifier = Identifier.tryParse(blockStr);
             if (blockIdentifier == null) {
@@ -89,6 +97,37 @@ public class BanishmentConfig {
             } catch (Exception ex) {
                 ModInit.LOGGER.info("Property 'range' with value '{}' is not a number, falling back to {}", shapeStr, Properties.Range);
             }
+
+            try {
+                Properties.Range = Integer.parseInt(range);
+            } catch (Exception ex) {
+                ModInit.LOGGER.info("Property 'range' with value '{}' is not a number, falling back to {}", shapeStr, Properties.Range);
+            }
+
+            try {
+                Properties.ProduceThunderOnBeaconActivation = Boolean.parseBoolean(produceThunderOnBeaconActivation);
+            } catch (Exception ex) {
+                ModInit.LOGGER.info("Property 'produceThunderOnBeaconActivation' with value '{}' is not a number, falling back to {}", shapeStr, Properties.ProduceThunderOnBeaconActivation);
+            }
+
+            try {
+                if (removeOnlyEntities.length() > 0) {
+                    Properties.RemoveOnlyEntities = Arrays.stream(removeOnlyEntities.split(","))
+                            .map(id -> Identifier.tryParse(id))
+                            .toList();
+                }
+            } catch (Exception ex) {
+                ModInit.LOGGER.info("Property 'removeOnlyEntities' with value '{}' is not able to be parsed", removeOnlyEntities);
+            }
+
+            try {
+                Enums.getIfPresent(SpawnGroup.class, removeOnlySpawnGroups);
+                Properties.RemoveOnlySpawnGroups = Arrays.stream(removeOnlySpawnGroups.split(","))
+                        .map(id -> Enums.getIfPresent(SpawnGroup.class, removeOnlySpawnGroups).get())
+                        .toList();
+            } catch (Exception ex) {
+                ModInit.LOGGER.info("Property 'removeOnlyEntities' with value '{}' is not able to be parsed", removeOnlyEntities);
+            }
         }
         catch (Exception ex) {
             ModInit.LOGGER.error("Could not read config from file", ex);
@@ -97,18 +136,19 @@ public class BanishmentConfig {
 
     private void toProperties(FileWriter writer) throws IOException {
         Properties prop = new Properties();
-        prop.setProperty("block", Properties.IndicatorBlock.getLootTableId().toString());
+        prop.setProperty("block", Registry.BLOCK.getId(Properties.IndicatorBlock).toString());
         prop.setProperty("shape", Properties.IndicatorShape.name);
         prop.setProperty("minTier", String.valueOf(Properties.MinTier));
         prop.setProperty("range", String.valueOf(Properties.Range));
+        var removeOnlyEntities = String.join(",", Properties.RemoveOnlyEntities.stream().map(x -> x.toString()).toList());
+        prop.setProperty("removeOnlyEntities", removeOnlyEntities);
+        prop.setProperty("produceThunderOnBeaconActivation", String.valueOf(Properties.ProduceThunderOnBeaconActivation));
         prop.store(writer, "");
     }
 
     public boolean isPosWithinSpawnProofArea(@NotNull BlockPos pos) {
         var vec = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
-        return beaconCacheLocations.values().stream().anyMatch(beaconPox -> {
-           return beaconPox.contains(vec);
-        });
+        return beaconCacheLocations.values().stream().anyMatch(beaconPox -> beaconPox.contains(vec));
     }
 
     public boolean addCachedBeacon(@NotNull BlockPos pos) {
@@ -149,7 +189,10 @@ public class BanishmentConfig {
         public Block IndicatorBlock = Blocks.DIAMOND_BLOCK;
         public Shape IndicatorShape = Shape.UNDER_BEACON;
         public int MinTier = 4;
-        public int Range = 100;
+        public int Range = 200;
+        public boolean ProduceThunderOnBeaconActivation = true;
+        public List<Identifier> RemoveOnlyEntities = new ArrayList<>();
+        public List<SpawnGroup> RemoveOnlySpawnGroups = Arrays.asList(SpawnGroup.MONSTER);
 
         public enum Shape {
             UNDER_BEACON("UNDER_BEACON"), // Just 1 block under beacon

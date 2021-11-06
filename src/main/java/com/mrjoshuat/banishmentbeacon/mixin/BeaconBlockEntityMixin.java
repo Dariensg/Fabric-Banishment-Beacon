@@ -34,6 +34,7 @@ public class BeaconBlockEntityMixin {
     private static void playSoundUpdateCachedBanishmentBeacons(World world, BlockPos pos, SoundEvent sound, CallbackInfo info) {
         if (sound == SoundEvents.BLOCK_BEACON_DEACTIVATE) {
             BanishmentConfig.INSTANCE.removeCachedBeacon(pos);
+            BeaconBlockEntityHandler.removeCachedLightningStrike(pos);
         } else if (sound == SoundEvents.BLOCK_BEACON_AMBIENT && BanishmentConfig.INSTANCE.isCachedBeacon(pos)) {
             BeaconBlockEntityHandler.produceBanishmentAreaParticles(world, pos);
         }

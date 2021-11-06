@@ -1,9 +1,10 @@
 package com.mrjoshuat.banishmentbeacon.handler;
 
 import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.Monster;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.BlockTags;
@@ -12,7 +13,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BeaconBlockEntityHandler {
+    private static List<BlockPos> lightningProducedAtCache = new ArrayList<>();
+
     public static void handleCanSpawn(World world, BlockPos pos, CallbackInfoReturnable<Boolean> info) {
         var withinArea = BanishmentConfig.INSTANCE.isPosWithinSpawnProofArea(pos);
         if (withinArea) {
@@ -101,18 +107,26 @@ public class BeaconBlockEntityHandler {
         if (validBanishmentBeacon && i >= BanishmentConfig.Properties.MinTier) {
             var pos = new BlockPos(x, y, z);
             if (BanishmentConfig.INSTANCE.addCachedBeacon(pos)) {
-                BeaconBlockEntityHandler.produceLightning(world, pos);
+                if (BanishmentConfig.Properties.ProduceThunderOnBeaconActivation && !lightningProducedAtCache.contains(pos)) {
+                    BeaconBlockEntityHandler.produceLightning(world, pos);
+                    lightningProducedAtCache.add(pos);
+                }
 
                 world.getOtherEntities(null, BanishmentConfig.INSTANCE.getCachedBeaconBox(pos))
                     .stream()
-                    .filter(f -> !f.hasCustomName() && f instanceof HostileEntity)
-                    .forEach(e -> {
-                        e.kill();
-                    });
+                    .filter(f -> f instanceof Monster)
+                    .filter(f -> !f.hasCustomName())
+                    .forEach(Entity::discard);
             }
         }
 
         return i;
+    }
+
+    public static void removeCachedLightningStrike(BlockPos pos) {
+        if (lightningProducedAtCache.contains(pos)) {
+            lightningProducedAtCache.remove(pos);
+        }
     }
 
     public static void produceBanishmentAreaParticles(World world, BlockPos pos) {
