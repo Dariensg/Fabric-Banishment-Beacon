@@ -1,6 +1,7 @@
-* Bad omen, the raiders should not spawn
-* Check the nether hoglins, ghasts, piglins can't spawn
-* Edit 'RemoveOnlyEntities' to be only RemoveEntities
-* First load removal should use same as canSpawn
-* ExcludeEntities, allows spawning
-* Allow bosses to spawn, elder guardian
+# Banishment Beacons
+
+Beacuse no one really likes mobs interrupting them when they're not asked for 🙂
+
+Designed to be highly customisable to fit most use-cases!
+
+For more information and details about the configuration, checkout the [Wiki here](https://github.com/MrJoshuaT/Fabric-Banishment-Beacon/wiki).
