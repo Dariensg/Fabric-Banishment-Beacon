@@ -1,7 +1,5 @@
 package com.mrjoshuat.banishmentbeacon.mixin;
 
-import com.mrjoshuat.banishmentbeacon.ModInit;
-import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
 import com.mrjoshuat.banishmentbeacon.handler.BeaconBlockEntityHandler;
 
 import net.minecraft.entity.SpawnGroup;

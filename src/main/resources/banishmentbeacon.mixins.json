@@ -7,7 +7,8 @@
     "BeaconBlockEntityMixin",
     "SpawnHelperMixin",
     "BlockMixin",
-    "RaidMixin"
+    "RaidMixin",
+    "WitherSkullBlockMixin"
   ],
   "client": [
   ],

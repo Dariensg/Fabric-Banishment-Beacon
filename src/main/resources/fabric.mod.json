@@ -1,16 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "banishmentbeacon",
   "version": "${version}",
 
   "name": "Banishment Beacons",
-  "description": "No one likes hostile mobs really",
+  "description": "Highly configurable spawn proofing beacons. Because no one likes hostile mobs really",
   "authors": [
-    "Me!"
+    "MrJoshuaT"
   ],
   "contact": {
     "homepage": "https://github.com/MrJoshuaT/Fabric-Banishment-Beacon/",
-    "sources": "https://github.com/MrJoshuaT/Fabric-Banishment-Beacon/"
+    "sources": "https://github.com/MrJoshuaT/Fabric-Banishment-Beacon/",
+    "wiki": "https://github.com/MrJoshuaT/Fabric-Banishment-Beacon/wiki"
   },
 
   "license": "CC0-1.0",
@@ -23,12 +24,12 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "banishmentbeacon.mixins.json"
   ],
 
   "depends": {
     "fabricloader": ">=0.11.3",
-    "fabric": "*",
+    "fabric": ">=0.41.0",
     "minecraft": "1.17.x",
     "java": ">=16"
   }
