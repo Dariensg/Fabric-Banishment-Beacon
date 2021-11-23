@@ -80,6 +80,8 @@ public class BanishmentConfig {
             var allowRaiderEntities = prop.getProperty("allowRaiderEntities", String.valueOf(true));
             var particleInterval = prop.getProperty("particleInterval", "160");
             var allowBossEntities = prop.getProperty("allowBossEntities", String.valueOf(true));
+            var removeEntitiesWanderingIntoSpawnProofArea = prop.getProperty("removeEntitiesWanderingIntoSpawnProofArea", String.valueOf(true));
+            var allowSpawnProofingWhileCoveredUp = prop.getProperty("allowSpawnProofingWhileCoveredUp", String.valueOf(true));
 
             var blockIdentifier = Identifier.tryParse(blockStr);
             if (blockIdentifier == null) {
@@ -153,6 +155,8 @@ public class BanishmentConfig {
             Properties.ProduceParticlesBoarder = Boolean.parseBoolean(produceParticlesBoarder);
             Properties.AllowRaiderEntities = Boolean.parseBoolean(allowRaiderEntities);
             Properties.AllowBossEntities = Boolean.parseBoolean(allowBossEntities);
+            Properties.RemoveEntitiesWanderingIntoSpawnProofArea = Boolean.parseBoolean(removeEntitiesWanderingIntoSpawnProofArea);
+            Properties.AllowSpawnProofingWhileCoveredUp = Boolean.parseBoolean(allowSpawnProofingWhileCoveredUp);
         }
         catch (Exception ex) {
             ModInit.LOGGER.error("Could not read config from file", ex);
@@ -177,6 +181,8 @@ public class BanishmentConfig {
         prop.setProperty("produceParticlesAtBeacon", String.valueOf(Properties.ProduceParticlesAtBeacon));
         prop.setProperty("allowBossEntities", String.valueOf(Properties.AllowBossEntities));
         prop.setProperty("allowRaiderEntities", String.valueOf(Properties.AllowRaiderEntities));
+        prop.setProperty("removeEntitiesWanderingIntoSpawnProofArea", String.valueOf(Properties.RemoveEntitiesWanderingIntoSpawnProofArea));
+        prop.setProperty("allowSpawnProofingWhileCoveredUp", String.valueOf(Properties.AllowSpawnProofingWhileCoveredUp));
         prop.store(writer, "");
     }
 
@@ -229,6 +235,8 @@ public class BanishmentConfig {
         public boolean ProduceParticlesAtBeacon = true;
         public boolean AllowRaiderEntities = true;
         public boolean AllowBossEntities = true;
+        public boolean AllowSpawnProofingWhileCoveredUp = true;
+        public boolean RemoveEntitiesWanderingIntoSpawnProofArea = true;
         public List<? extends EntityType<?>> DenylistEntities = new ArrayList<>();
         public List<? extends EntityType<?>> AllowlistEntities = new ArrayList<>();
         public List<SpawnGroup> RemoveSpawnGroups = Arrays.asList(SpawnGroup.MONSTER);

@@ -2,17 +2,17 @@ package com.mrjoshuat.banishmentbeacon.handler;
 
 import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.*;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 
@@ -156,6 +156,24 @@ public class BeaconBlockEntityHandler {
         }
     }
 
+    public static void removeWanderingEntitiesInArea(World world, BlockPos pos) {
+        if (world.isClient)
+            return;
+
+        var box = BanishmentConfig.INSTANCE.getCachedBeaconBox(pos);
+        if (box == null)
+            return; // Should this ever be hit, hm?
+        var entities = world.getEntitiesByClass(LivingEntity.class, box, e -> {
+            var entityType = Registry.ENTITY_TYPE.getOrEmpty(EntityType.getId(e.getType())).get();
+            var shouldRemove = !handleCanSpawn(entityType.getSpawnGroup(), entityType, pos.mutableCopy());
+            return shouldRemove;
+        });
+        entities.forEach(e -> {
+            e.discard();
+            produceBeaconParticles(world, e.getBlockPos(), ParticleTypes.HEART);
+        });
+    }
+
     public static void produceAdHocParticlesAtPos(World world, BlockPos pos) {
         produceAdHocParticlesAtPos(world, pos, ParticleTypes.WHITE_ASH);
     }
@@ -165,6 +183,9 @@ public class BeaconBlockEntityHandler {
     }
 
     private static void produceBeaconParticles(World world, BlockPos pos, ParticleEffect parameters) {
+        if (world.isClient)
+            return;
+
         var random = world.getRandom();
         var serverWorld = (ServerWorld)world;
         for(int i = 0; i < 5; ++i) {

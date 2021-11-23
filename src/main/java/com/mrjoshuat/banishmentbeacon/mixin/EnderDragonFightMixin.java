@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EnderDragonFight.class)
 public class EnderDragonFightMixin {
-    @Inject(
+    /*@Inject(
         at = @At("RETURN"),
         method = "createDragon()Lnet/minecraft/entity/boss/dragon/EnderDragonEntity;"
     )
@@ -27,5 +27,5 @@ public class EnderDragonFightMixin {
         if (dragonWithinSpawnProofArea) {
             dragon.remove(Entity.RemovalReason.DISCARDED);
         }
-    }
+    }*/
 }
