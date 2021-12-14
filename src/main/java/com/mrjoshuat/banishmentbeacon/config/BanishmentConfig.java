@@ -72,7 +72,7 @@ public class BanishmentConfig {
             var minTier = prop.getProperty("minTier", "4");
             var range = prop.getProperty("range", "200");
             var denylistEntities = prop.getProperty("denylistEntities", "");
-            var allowlistEntities = prop.getProperty("allowlistEntities", "");
+            var allowlistEntities = prop.getProperty("allowlistEntities", "minecraft:ender_dragon");
             var removeSpawnGroups = prop.getProperty("removeSpawnGroups", SpawnGroup.MONSTER.toString());
             var produceThunderOnBeaconActivation = prop.getProperty("produceThunderOnBeaconActivation", String.valueOf(false));
             var produceParticlesBoarder = prop.getProperty("produceParticlesBoarder", String.valueOf(true));
@@ -117,6 +117,10 @@ public class BanishmentConfig {
             try {
                 if (denylistEntities.length() > 0) {
                     Properties.DenylistEntities = Arrays.stream(denylistEntities.split(","))
+                        .map(val -> {
+                            var split = val.split("\\.");
+                            return split[split.length - 1];
+                        })
                         .map(Identifier::tryParse)
                         .map(Registry.ENTITY_TYPE::get)
                         .toList();
@@ -128,6 +132,10 @@ public class BanishmentConfig {
             try {
                 if (allowlistEntities.length() > 0) {
                     Properties.AllowlistEntities = Arrays.stream(allowlistEntities.split(","))
+                        .map(val -> {
+                            var split = val.split("\\.");
+                            return split[split.length - 1];
+                        })
                         .map(Identifier::tryParse)
                         .map(Registry.ENTITY_TYPE::get)
                         .toList();
