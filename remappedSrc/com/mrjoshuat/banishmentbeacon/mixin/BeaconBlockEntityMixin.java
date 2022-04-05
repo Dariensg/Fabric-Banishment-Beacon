@@ -1,5 +1,6 @@
 package com.mrjoshuat.banishmentbeacon.mixin;
 
+import I;
 import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
 import com.mrjoshuat.banishmentbeacon.handler.BeaconBlockEntityHandler;
 
@@ -37,7 +38,7 @@ public class BeaconBlockEntityMixin {
         if (sound == SoundEvents.BLOCK_BEACON_DEACTIVATE) {
             BanishmentConfig.INSTANCE.removeCachedBeacon(pos);
         } else if (sound == SoundEvents.BLOCK_BEACON_AMBIENT && BanishmentConfig.INSTANCE.isCachedBeacon(pos)) {
-            // BeaconBlockEntityHandler.produceBanishmentAreaParticles(world, pos);
+            BeaconBlockEntityHandler.produceBanishmentAreaParticles(world, pos);
             BeaconBlockEntityHandler.removeWanderingEntitiesInArea(world, pos);
         }
     }
@@ -53,10 +54,6 @@ public class BeaconBlockEntityMixin {
         
         if (world.getTime() % 80L == 0L) {
             BeaconBlockEntityHandler.updateLevelHandler(world, pos.getX(), pos.getY(), pos.getZ());
-        }
-
-        if (BeaconBlockEntityHandler.hasCachedPositionAt(pos)) {
-            BeaconBlockEntityHandler.produceBanishmentAreaParticles(world, pos);
         }
     }
 }

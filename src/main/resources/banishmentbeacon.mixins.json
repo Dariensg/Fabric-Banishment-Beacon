@@ -8,7 +8,8 @@
     "SpawnHelperMixin",
     "BlockMixin",
     "RaidMixin",
-    "WitherSkullBlockMixin"
+    "WitherSkullBlockMixin",
+    "ServerPlayerInteractionManagerMixin"
   ],
   "client": [
   ],

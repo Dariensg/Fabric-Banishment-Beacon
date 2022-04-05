@@ -12,7 +12,6 @@ public class ModInit implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Starting Banishment Beacon, server init");
 		BanishmentConfig.INSTANCE.load();
 	}
 }

@@ -1,8 +1,11 @@
 package com.mrjoshuat.banishmentbeacon.handler;
 
+import D;
+import I;
+import Z;
 import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
-
-import net.minecraft.block.Blocks;
+import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig.BanishmentProperties.Shape;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.DefaultParticleType;
@@ -12,6 +15,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.Mutable;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
@@ -20,6 +25,7 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class BeaconBlockEntityHandler {
     public static final List<EntityType<?>> bossEntities = Arrays.asList(EntityType.ENDER_DRAGON, EntityType.WITHER, EntityType.ELDER_GUARDIAN);
@@ -122,7 +128,7 @@ public class BeaconBlockEntityHandler {
                     lightningProducedAtCache.add(pos);
                 }
 
-                world.getEntitiesByClass(MobEntity.class, BanishmentConfig.INSTANCE.getCachedBeaconBox(pos), f -> !f.hasCustomName())
+                world.getEntitiesByClass(MobEntity.class, BanishmentConfig.INSTANCE.getCachedBeaconBox(pos), f -> !f.hasCustomName() && !f.isPersistent())
                     .forEach(e -> {
                         var entityType = e.getType();
                         var spawnGroup = entityType.getSpawnGroup();
@@ -149,13 +155,9 @@ public class BeaconBlockEntityHandler {
         if (world.isClient)
             return;
 
-        if (world.getTime() % 10 == 0) {
-            produceBeaconParticles(world, pos);
-        }
-
         if (world.getTime() % BanishmentConfig.Properties.ParticleInterval == 0L) {
-            //if (BanishmentConfig.Properties.ProduceParticlesAtBeacon)
-                // produceBeaconParticles(world, pos); // produceBeaconParticles(world, pos, ParticleTypes.ENCHANT);
+            if (BanishmentConfig.Properties.ProduceParticlesAtBeacon)
+                produceBeaconParticles(world, pos, ParticleTypes.ENCHANT);
             if (BanishmentConfig.Properties.ProduceParticlesBoarder)
                 produceBoarderParticles(world, pos, ParticleTypes.WHITE_ASH);
         }
@@ -173,9 +175,9 @@ public class BeaconBlockEntityHandler {
             var shouldRemove = !handleCanSpawn(entityType.getSpawnGroup(), entityType, pos.mutableCopy());
             return shouldRemove;
         });
-        entities.stream().filter(e -> !e.hasCustomName()).forEach(e -> {
+        entities.forEach(e -> {
             e.discard();
-            produceAdHocParticlesAtPos(world, e.getBlockPos(), ParticleTypes.HEART);
+            produceBeaconParticles(world, e.getBlockPos(), ParticleTypes.HEART);
         });
     }
 
@@ -183,7 +185,11 @@ public class BeaconBlockEntityHandler {
         produceAdHocParticlesAtPos(world, pos, ParticleTypes.WHITE_ASH);
     }
 
-    public static void produceAdHocParticlesAtPos(World world, BlockPos pos, DefaultParticleType parameters) {
+    public static void produceAdHocParticlesAtPos(World world, BlockPos pos, DefaultParticleType particleType) {
+        produceBeaconParticles(world, pos, particleType);
+    }
+
+    private static void produceBeaconParticles(World world, BlockPos pos, ParticleEffect parameters) {
         if (world.isClient)
             return;
 
@@ -198,20 +204,6 @@ public class BeaconBlockEntityHandler {
             var randomZ = pos.getZ() + random.nextDouble();
             serverWorld.spawnParticles(parameters, randomX, randomY, randomZ, 2, d, e, f, 0);
         }
-    }
-
-    private static void produceBeaconParticles(World world, BlockPos pos) {
-        var serverWorld = (ServerWorld)world;
-
-        serverWorld.spawnParticles(ParticleTypes.ENCHANT,
-            (double)pos.getX() + 0.5,
-            (double)pos.getY() + 1.0,
-            (double)pos.getZ() + 0.5,
-            20,
-            0,
-            0,
-            0,
-            5);
     }
 
     private static void produceBoarderParticles(World world, BlockPos pos, DefaultParticleType particleType) {
@@ -229,9 +221,5 @@ public class BeaconBlockEntityHandler {
                 }
             }
         }
-    }
-
-    public static boolean hasCachedPositionAt(BlockPos pos) {
-        return lightningProducedAtCache.contains(pos);
     }
 }
