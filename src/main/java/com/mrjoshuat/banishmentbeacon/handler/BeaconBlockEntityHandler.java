@@ -2,15 +2,12 @@ package com.mrjoshuat.banishmentbeacon.handler;
 
 import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.DefaultParticleType;
-import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;

@@ -23,9 +23,9 @@ public class ServerPlayerInteractionManagerMixin {
 
     @Inject(
         at = @At("HEAD"),
-        method = "processBlockBreakingAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;Lnet/minecraft/util/math/Direction;I)V"
+        method = "processBlockBreakingAction(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;Lnet/minecraft/util/math/Direction;II)V"
     )
-    public void addHaste3ToNetheritePickOnDeepslate(BlockPos pos, PlayerActionC2SPacket.Action action, Direction direction, int worldHeight, CallbackInfo info) {
+    public void addHaste3ToNetheritePickOnDeepslate(BlockPos pos, PlayerActionC2SPacket.Action action, Direction direction, int worldHeight, int sequence, CallbackInfo info) {
         DeepslateHasteHandler.addHasteToNetheritePickOnDeepslate(player, world, pos, action, direction, worldHeight);
     }
 }

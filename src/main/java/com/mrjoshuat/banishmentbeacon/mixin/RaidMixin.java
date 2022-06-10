@@ -31,6 +31,9 @@ public class RaidMixin {
         method = "addRaider(ILnet/minecraft/entity/raid/RaiderEntity;Lnet/minecraft/util/math/BlockPos;Z)V"
     )
     private void addRaider(int wave, RaiderEntity raider, @Nullable BlockPos pos, boolean existing, CallbackInfo info) {
+        if (pos == null) {
+            return;
+        }
         if (!BanishmentConfig.Properties.AllowRaiderEntities && BanishmentConfig.INSTANCE.isPosWithinSpawnProofArea(pos)) {
             try {
                 raider.setRemoved(Entity.RemovalReason.DISCARDED);
