@@ -12,6 +12,7 @@ import net.minecraft.village.raid.Raid;
 
 import org.jetbrains.annotations.Nullable;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,6 +24,7 @@ public class RaidMixin {
     // NOTE: this is not used, as clients need to have the same translation, if just raw text all clients see it :/
     // private static final Text RAID_BANISHED_TEXT = new TranslatableText("event.minecraft.raid.banished");
 
+    @Final
     @Shadow
     private ServerBossBar bar;
 
@@ -34,10 +36,10 @@ public class RaidMixin {
         if (pos == null) {
             return;
         }
-        if (!BanishmentConfig.Properties.AllowRaiderEntities && BanishmentConfig.INSTANCE.isPosWithinSpawnProofArea(pos)) {
+        if (!BanishmentConfig.PROPERTIES.allowRaiderEntities && BanishmentConfig.INSTANCE.isPosWithinSpawnProofArea(pos)) {
             try {
                 raider.setRemoved(Entity.RemovalReason.DISCARDED);
-                BeaconBlockEntityHandler.produceAdHocParticlesAtPos(raider.world, pos);
+                BeaconBlockEntityHandler.produceAdHocParticlesAtPos(raider.getWorld(), pos);
                 bar.setName(Text.of("Raid - Banished"));
             } catch (Exception ignored) {}
         }
@@ -49,7 +51,7 @@ public class RaidMixin {
         cancellable = true
     )
     private void playRaidHorn(BlockPos pos, CallbackInfo info) {
-        if (!BanishmentConfig.Properties.AllowRaiderEntities && BanishmentConfig.INSTANCE.isPosWithinSpawnProofArea(pos)) {
+        if (!BanishmentConfig.PROPERTIES.allowRaiderEntities && BanishmentConfig.INSTANCE.isPosWithinSpawnProofArea(pos)) {
             info.cancel();
         }
     }

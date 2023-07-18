@@ -20,7 +20,7 @@ public class WitherSkullBlockMixin {
         cancellable = true
     )
     private static void onPlaced(World world, BlockPos pos, SkullBlockEntity block, CallbackInfo info) {
-        if (BanishmentConfig.Properties.AllowBossEntities)
+        if (BanishmentConfig.PROPERTIES.allowBossEntities)
             return;
 
         var witherWithinSpawnProofArea = BanishmentConfig.INSTANCE.isPosWithinSpawnProofArea(pos);

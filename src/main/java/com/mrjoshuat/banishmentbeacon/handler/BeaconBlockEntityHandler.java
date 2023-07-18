@@ -6,11 +6,11 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 
@@ -28,27 +28,24 @@ public class BeaconBlockEntityHandler {
             return true;
         }
 
-        if (BanishmentConfig.Properties.AllowlistEntities.size() > 0 && BanishmentConfig.Properties.AllowlistEntities.contains(entityType)) {
+        if (BanishmentConfig.PROPERTIES.allowlistEntities.size() > 0 && BanishmentConfig.PROPERTIES.allowlistEntities.contains(entityType)) {
             return true;
         }
 
-        if (BanishmentConfig.Properties.DenylistEntities.size() > 0 && BanishmentConfig.Properties.DenylistEntities.contains(entityType)) {
+        if (BanishmentConfig.PROPERTIES.denylistEntities.size() > 0 && BanishmentConfig.PROPERTIES.denylistEntities.contains(entityType)) {
             return false;
         }
 
-        if (BanishmentConfig.Properties.AllowBossEntities && BeaconBlockEntityHandler.bossEntities.contains(entityType)) {
+        if (BanishmentConfig.PROPERTIES.allowBossEntities && BeaconBlockEntityHandler.bossEntities.contains(entityType)) {
             return true;
         }
 
-        if (BanishmentConfig.Properties.RemoveSpawnGroups.contains(group)) {
-            return false;
-        }
-
-        return true;
+        return !BanishmentConfig.PROPERTIES.removeSpawnGroups.contains(group);
     }
 
     public static void produceLightning(World world, BlockPos pos) {
         LightningEntity lightningEntity = EntityType.LIGHTNING_BOLT.create(world);
+        assert lightningEntity != null;
         lightningEntity.refreshPositionAfterTeleport(Vec3d.ofBottomCenter(pos));
         lightningEntity.setChanneler(null);
         lightningEntity.setCosmetic(true);
@@ -56,7 +53,7 @@ public class BeaconBlockEntityHandler {
     }
 
     public static int updateLevelHandler(World world, int x, int y, int z) {
-        var banishmentShape = BanishmentConfig.Properties.IndicatorShape;
+        var banishmentShape = BanishmentConfig.PROPERTIES.indicatorShape;
         int i = 0;
         var validBanishmentBeacon = false;
 
@@ -77,7 +74,7 @@ public class BeaconBlockEntityHandler {
                     }
 
                     if (banishmentShape == BanishmentConfig.BanishmentProperties.Shape.FULL_BASE
-                        && blockState.getBlock() != BanishmentConfig.Properties.IndicatorBlock) {
+                        && blockState.getBlock() != BanishmentConfig.PROPERTIES.indicatorBlock) {
                         bl = false;
                         break;
                     }
@@ -90,16 +87,16 @@ public class BeaconBlockEntityHandler {
                     var isCentre = l == x && m == z;
 
                     if (banishmentShape == BanishmentConfig.BanishmentProperties.Shape.UNDER_BEACON) {
-                        if (j == 1 && isCentre && blockState.getBlock() == BanishmentConfig.Properties.IndicatorBlock) {
+                        if (j == 1 && isCentre && blockState.getBlock() == BanishmentConfig.PROPERTIES.indicatorBlock) {
                             validBanishmentBeacon = true;
                         }
                     } else if (banishmentShape == BanishmentConfig.BanishmentProperties.Shape.CENTRE_COLUMN) {
-                        if (isCentre && blockState.getBlock() == BanishmentConfig.Properties.IndicatorBlock) {
+                        if (isCentre && blockState.getBlock() == BanishmentConfig.PROPERTIES.indicatorBlock) {
                             validBanishmentBeacon = true;
                         }
                     }
                     else if (banishmentShape == BanishmentConfig.BanishmentProperties.Shape.CORNERS) {
-                        if (isCorner && blockState.getBlock() == BanishmentConfig.Properties.IndicatorBlock) {
+                        if (isCorner && blockState.getBlock() == BanishmentConfig.PROPERTIES.indicatorBlock) {
                             validBanishmentBeacon = true;
                         }
                     }
@@ -111,10 +108,10 @@ public class BeaconBlockEntityHandler {
             }
         }
 
-        if (validBanishmentBeacon && i >= BanishmentConfig.Properties.MinTier) {
+        if (validBanishmentBeacon && i >= BanishmentConfig.PROPERTIES.minTier) {
             var pos = new BlockPos(x, y, z);
             if (BanishmentConfig.INSTANCE.addCachedBeacon(pos)) {
-                if (BanishmentConfig.Properties.ProduceThunderOnBeaconActivation && !lightningProducedAtCache.contains(pos)) {
+                if (BanishmentConfig.PROPERTIES.produceThunderOnBeaconActivation && !lightningProducedAtCache.contains(pos)) {
                     BeaconBlockEntityHandler.produceLightning(world, pos);
                     lightningProducedAtCache.add(pos);
                 }
@@ -150,10 +147,10 @@ public class BeaconBlockEntityHandler {
             produceBeaconParticles(world, pos);
         }
 
-        if (world.getTime() % BanishmentConfig.Properties.ParticleInterval == 0L) {
+        if (world.getTime() % BanishmentConfig.PROPERTIES.particleInterval == 0L) {
             //if (BanishmentConfig.Properties.ProduceParticlesAtBeacon)
                 // produceBeaconParticles(world, pos); // produceBeaconParticles(world, pos, ParticleTypes.ENCHANT);
-            if (BanishmentConfig.Properties.ProduceParticlesBoarder)
+            if (BanishmentConfig.PROPERTIES.produceParticlesBoarder)
                 produceBoarderParticles(world, pos, ParticleTypes.WHITE_ASH);
         }
     }
@@ -166,9 +163,8 @@ public class BeaconBlockEntityHandler {
         if (box == null)
             return; // Should this ever be hit, hm?
         var entities = world.getEntitiesByClass(LivingEntity.class, box, e -> {
-            var entityType = Registry.ENTITY_TYPE.getOrEmpty(EntityType.getId(e.getType())).get();
-            var shouldRemove = !handleCanSpawn(entityType.getSpawnGroup(), entityType, pos.mutableCopy());
-            return shouldRemove;
+            var entityType = Registries.ENTITY_TYPE.getOrEmpty(EntityType.getId(e.getType())).get();
+            return !handleCanSpawn(entityType.getSpawnGroup(), entityType, pos.mutableCopy());
         });
         entities.stream().filter(e -> !e.hasCustomName()).forEach(e -> {
             e.discard();
@@ -216,7 +212,7 @@ public class BeaconBlockEntityHandler {
         var y = 0;
         var z = pos.getZ();
         var serverWorld = (ServerWorld)world;
-        var radius = BanishmentConfig.Properties.Range;
+        var radius = BanishmentConfig.PROPERTIES.range;
 
         for (int worldX = x - radius; worldX <= x + radius + 1; ++worldX) {
             for (int worldZ = z - radius;worldZ <= z + radius + 1; ++worldZ) {
