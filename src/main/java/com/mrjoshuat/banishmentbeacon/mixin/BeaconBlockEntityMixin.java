@@ -47,7 +47,7 @@ public class BeaconBlockEntityMixin {
         method = "tick(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/entity/BeaconBlockEntity;)V"
     )
     private static void tick(World world, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo info) {
-        if (!BanishmentConfig.Properties.AllowSpawnProofingWhileCoveredUp) {
+        if (!BanishmentConfig.PROPERTIES.allowSpawnProofingWhileCoveredUp) {
             return;
         }
         

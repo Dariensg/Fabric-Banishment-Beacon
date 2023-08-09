@@ -11,11 +11,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,9 +28,9 @@ import java.util.*;
 public class BanishmentConfig {
     protected final File file;
     public static final BanishmentConfig INSTANCE = new BanishmentConfig(FabricLoader.getInstance().getConfigDir().resolve(ModInit.ModID + ".properties").toFile());
-    public static final BanishmentProperties Properties = new BanishmentProperties();
+    public static final BanishmentProperties PROPERTIES = new BanishmentProperties();
 
-    private static final BiMap<BlockPos, Box> beaconCacheLocations = HashBiMap.create();
+    private static final BiMap<BlockPos, Box> BEACON_CACHE_LOCATIONS = HashBiMap.create();
 
     public BanishmentConfig(File file) {
         this.file = file;
@@ -85,44 +85,44 @@ public class BanishmentConfig {
 
             var blockIdentifier = Identifier.tryParse(blockStr);
             if (blockIdentifier == null) {
-                ModInit.LOGGER.info("Property 'block' with value '{}' is not a valid block identifier, falling back to {}", blockStr, Properties.IndicatorBlock);
+                ModInit.LOGGER.info("Property 'block' with value '{}' is not a valid block identifier, falling back to {}", blockStr, PROPERTIES.indicatorBlock);
             } else {
-                Properties.IndicatorBlock = Registry.BLOCK.get(blockIdentifier);
+                PROPERTIES.indicatorBlock = Registries.BLOCK.get(blockIdentifier);
             }
 
             try {
-                Properties.IndicatorShape = BanishmentProperties.Shape.valueOf(shapeStr);
+                PROPERTIES.indicatorShape = BanishmentProperties.Shape.valueOf(shapeStr);
             } catch (Exception ex) {
-                ModInit.LOGGER.info("Property 'shape' with value '{}' is not a valid shape, falling back to {}", shapeStr, Properties.IndicatorShape);
+                ModInit.LOGGER.info("Property 'shape' with value '{}' is not a valid shape, falling back to {}", shapeStr, PROPERTIES.indicatorShape);
             }
 
             try {
-                Properties.MinTier = Integer.parseInt(minTier);
+                PROPERTIES.minTier = Integer.parseInt(minTier);
             } catch (Exception ex) {
-                ModInit.LOGGER.info("Property 'minTier' with value '{}' is not a number, falling back to {}", shapeStr, Properties.MinTier);
+                ModInit.LOGGER.info("Property 'minTier' with value '{}' is not a number, falling back to {}", shapeStr, PROPERTIES.minTier);
             }
 
             try {
-                Properties.Range = Integer.parseInt(range);
+                PROPERTIES.range = Integer.parseInt(range);
             } catch (Exception ex) {
-                ModInit.LOGGER.info("Property 'range' with value '{}' is not a number, falling back to {}", shapeStr, Properties.Range);
+                ModInit.LOGGER.info("Property 'range' with value '{}' is not a number, falling back to {}", shapeStr, PROPERTIES.range);
             }
 
             try {
-                Properties.Range = Integer.parseInt(range);
+                PROPERTIES.range = Integer.parseInt(range);
             } catch (Exception ex) {
-                ModInit.LOGGER.info("Property 'range' with value '{}' is not a number, falling back to {}", shapeStr, Properties.Range);
+                ModInit.LOGGER.info("Property 'range' with value '{}' is not a number, falling back to {}", shapeStr, PROPERTIES.range);
             }
 
             try {
                 if (denylistEntities.length() > 0) {
-                    Properties.DenylistEntities = Arrays.stream(denylistEntities.split(","))
+                    PROPERTIES.denylistEntities = Arrays.stream(denylistEntities.split(","))
                         .map(val -> {
                             var split = val.split("\\.");
                             return split[split.length - 1];
                         })
                         .map(Identifier::tryParse)
-                        .map(Registry.ENTITY_TYPE::get)
+                        .map(Registries.ENTITY_TYPE::get)
                         .toList();
                 }
             } catch (Exception ex) {
@@ -131,13 +131,13 @@ public class BanishmentConfig {
 
             try {
                 if (allowlistEntities.length() > 0) {
-                    Properties.AllowlistEntities = Arrays.stream(allowlistEntities.split(","))
+                    PROPERTIES.allowlistEntities = Arrays.stream(allowlistEntities.split(","))
                         .map(val -> {
                             var split = val.split("\\.");
                             return split[split.length - 1];
                         })
                         .map(Identifier::tryParse)
-                        .map(Registry.ENTITY_TYPE::get)
+                        .map(Registries.ENTITY_TYPE::get)
                         .toList();
                 }
             } catch (Exception ex) {
@@ -145,7 +145,7 @@ public class BanishmentConfig {
             }
 
             try {
-                Properties.RemoveSpawnGroups = Arrays.stream(removeSpawnGroups.split(","))
+                PROPERTIES.removeSpawnGroups = Arrays.stream(removeSpawnGroups.split(","))
                     .map(id -> Enums.getIfPresent(SpawnGroup.class, removeSpawnGroups).get())
                     .toList();
             } catch (Exception ex) {
@@ -153,18 +153,18 @@ public class BanishmentConfig {
             }
 
             try {
-                Properties.ParticleInterval = Integer.parseInt(particleInterval);
+                PROPERTIES.particleInterval = Integer.parseInt(particleInterval);
             } catch (Exception ex) {
-                ModInit.LOGGER.info("Property 'particleInterval' with value '{}' is not a number, falling back to {}", shapeStr, Properties.ParticleInterval);
+                ModInit.LOGGER.info("Property 'particleInterval' with value '{}' is not a number, falling back to {}", shapeStr, PROPERTIES.particleInterval);
             }
 
-            Properties.ProduceThunderOnBeaconActivation = Boolean.parseBoolean(produceThunderOnBeaconActivation);
-            Properties.ProduceParticlesAtBeacon = Boolean.parseBoolean(produceParticlesAtBeacon);
-            Properties.ProduceParticlesBoarder = Boolean.parseBoolean(produceParticlesBoarder);
-            Properties.AllowRaiderEntities = Boolean.parseBoolean(allowRaiderEntities);
-            Properties.AllowBossEntities = Boolean.parseBoolean(allowBossEntities);
-            Properties.RemoveEntitiesWanderingIntoSpawnProofArea = Boolean.parseBoolean(removeEntitiesWanderingIntoSpawnProofArea);
-            Properties.AllowSpawnProofingWhileCoveredUp = Boolean.parseBoolean(allowSpawnProofingWhileCoveredUp);
+            PROPERTIES.produceThunderOnBeaconActivation = Boolean.parseBoolean(produceThunderOnBeaconActivation);
+            PROPERTIES.produceParticlesAtBeacon = Boolean.parseBoolean(produceParticlesAtBeacon);
+            PROPERTIES.produceParticlesBoarder = Boolean.parseBoolean(produceParticlesBoarder);
+            PROPERTIES.allowRaiderEntities = Boolean.parseBoolean(allowRaiderEntities);
+            PROPERTIES.allowBossEntities = Boolean.parseBoolean(allowBossEntities);
+            PROPERTIES.removeEntitiesWanderingIntoSpawnProofArea = Boolean.parseBoolean(removeEntitiesWanderingIntoSpawnProofArea);
+            PROPERTIES.allowSpawnProofingWhileCoveredUp = Boolean.parseBoolean(allowSpawnProofingWhileCoveredUp);
         }
         catch (Exception ex) {
             ModInit.LOGGER.error("Could not read config from file", ex);
@@ -173,37 +173,37 @@ public class BanishmentConfig {
 
     private void toProperties(FileWriter writer) throws IOException {
         Properties prop = new Properties();
-        prop.setProperty("block", Registry.BLOCK.getId(Properties.IndicatorBlock).toString());
-        prop.setProperty("shape", Properties.IndicatorShape.name);
-        prop.setProperty("minTier", String.valueOf(Properties.MinTier));
-        prop.setProperty("range", String.valueOf(Properties.Range));
-        prop.setProperty("particleInterval", String.valueOf(Properties.ParticleInterval));
-        var denylistEntities = String.join(",", Properties.DenylistEntities.stream().map(EntityType::toString).toList());
+        prop.setProperty("block", Registries.BLOCK.getId(PROPERTIES.indicatorBlock).toString());
+        prop.setProperty("shape", PROPERTIES.indicatorShape.name);
+        prop.setProperty("minTier", String.valueOf(PROPERTIES.minTier));
+        prop.setProperty("range", String.valueOf(PROPERTIES.range));
+        prop.setProperty("particleInterval", String.valueOf(PROPERTIES.particleInterval));
+        var denylistEntities = String.join(",", PROPERTIES.denylistEntities.stream().map(EntityType::toString).toList());
         prop.setProperty("denylistEntities", denylistEntities);
-        var allowlistEntities = String.join(",", Properties.AllowlistEntities.stream().map(EntityType::toString).toList());
+        var allowlistEntities = String.join(",", PROPERTIES.allowlistEntities.stream().map(EntityType::toString).toList());
         prop.setProperty("allowlistEntities", allowlistEntities);
-        prop.setProperty("produceThunderOnBeaconActivation", String.valueOf(Properties.ProduceThunderOnBeaconActivation));
-        var removeOnlySpawnGroups = String.join(",", Properties.RemoveSpawnGroups.stream().map(Enum::toString).toList());
+        prop.setProperty("produceThunderOnBeaconActivation", String.valueOf(PROPERTIES.produceThunderOnBeaconActivation));
+        var removeOnlySpawnGroups = String.join(",", PROPERTIES.removeSpawnGroups.stream().map(Enum::toString).toList());
         prop.setProperty("removeSpawnGroups", removeOnlySpawnGroups);
-        prop.setProperty("produceParticlesBoarder", String.valueOf(Properties.ProduceParticlesBoarder));
-        prop.setProperty("produceParticlesAtBeacon", String.valueOf(Properties.ProduceParticlesAtBeacon));
-        prop.setProperty("allowBossEntities", String.valueOf(Properties.AllowBossEntities));
-        prop.setProperty("allowRaiderEntities", String.valueOf(Properties.AllowRaiderEntities));
-        prop.setProperty("removeEntitiesWanderingIntoSpawnProofArea", String.valueOf(Properties.RemoveEntitiesWanderingIntoSpawnProofArea));
-        prop.setProperty("allowSpawnProofingWhileCoveredUp", String.valueOf(Properties.AllowSpawnProofingWhileCoveredUp));
+        prop.setProperty("produceParticlesBoarder", String.valueOf(PROPERTIES.produceParticlesBoarder));
+        prop.setProperty("produceParticlesAtBeacon", String.valueOf(PROPERTIES.produceParticlesAtBeacon));
+        prop.setProperty("allowBossEntities", String.valueOf(PROPERTIES.allowBossEntities));
+        prop.setProperty("allowRaiderEntities", String.valueOf(PROPERTIES.allowRaiderEntities));
+        prop.setProperty("removeEntitiesWanderingIntoSpawnProofArea", String.valueOf(PROPERTIES.removeEntitiesWanderingIntoSpawnProofArea));
+        prop.setProperty("allowSpawnProofingWhileCoveredUp", String.valueOf(PROPERTIES.allowSpawnProofingWhileCoveredUp));
         prop.store(writer, "");
     }
 
     public boolean isPosWithinSpawnProofArea(@NotNull BlockPos pos) {
         var vec = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
-        return beaconCacheLocations.values().stream().anyMatch(beaconPox -> beaconPox.contains(vec));
+        return BEACON_CACHE_LOCATIONS.values().stream().anyMatch(beaconPox -> beaconPox.contains(vec));
     }
 
     public boolean addCachedBeacon(@NotNull BlockPos pos) {
-        if (!beaconCacheLocations.containsKey(pos)) {
+        if (!BEACON_CACHE_LOCATIONS.containsKey(pos)) {
             ModInit.LOGGER.info("Banishment beacon cache added at " + pos);
             try {
-                beaconCacheLocations.put(pos, createBoxBoundary(pos));
+                BEACON_CACHE_LOCATIONS.put(pos, createBoxBoundary(pos));
                 return true;
             } catch (Exception ex) {
                 ModInit.LOGGER.error("Failed to add cached beacon at " + pos);
@@ -214,41 +214,41 @@ public class BanishmentConfig {
     }
 
     public void removeCachedBeacon(@NotNull BlockPos pos) {
-        if (beaconCacheLocations.containsKey(pos)) {
+        if (BEACON_CACHE_LOCATIONS.containsKey(pos)) {
             ModInit.LOGGER.info("Banishment beacon cache removed at " + pos);
             try {
-                beaconCacheLocations.remove(pos);
+                BEACON_CACHE_LOCATIONS.remove(pos);
             } catch (Exception ex) {
                 ModInit.LOGGER.error("Failed to remove cached beacon at " + pos);
             }
         }
     }
 
-    public Box getCachedBeaconBox(@NotNull BlockPos pos) { return beaconCacheLocations.get(pos); }
+    public Box getCachedBeaconBox(@NotNull BlockPos pos) { return BEACON_CACHE_LOCATIONS.get(pos); }
 
-    public boolean isCachedBeacon(@NotNull BlockPos pos) { return beaconCacheLocations.containsKey(pos); }
+    public boolean isCachedBeacon(@NotNull BlockPos pos) { return BEACON_CACHE_LOCATIONS.containsKey(pos); }
 
     private Box createBoxBoundary(BlockPos pos) {
-        return new Box(pos).expand(BanishmentConfig.Properties.Range);
+        return new Box(pos).expand(BanishmentConfig.PROPERTIES.range);
     }
 
     public static class BanishmentProperties {
         // Set defaults here
-        public Block IndicatorBlock = Blocks.DIAMOND_BLOCK;
-        public Shape IndicatorShape = Shape.UNDER_BEACON;
-        public int MinTier = 4;
-        public int Range = 200;
-        public boolean ProduceThunderOnBeaconActivation = true;
-        public boolean ProduceParticlesBoarder = true;
-        public boolean ProduceParticlesAtBeacon = true;
-        public boolean AllowRaiderEntities = true;
-        public boolean AllowBossEntities = true;
-        public boolean AllowSpawnProofingWhileCoveredUp = true;
-        public boolean RemoveEntitiesWanderingIntoSpawnProofArea = true;
-        public List<? extends EntityType<?>> DenylistEntities = new ArrayList<>();
-        public List<? extends EntityType<?>> AllowlistEntities = new ArrayList<>();
-        public List<SpawnGroup> RemoveSpawnGroups = Arrays.asList(SpawnGroup.MONSTER);
-        public int ParticleInterval = 160;
+        public Block indicatorBlock = Blocks.DIAMOND_BLOCK;
+        public Shape indicatorShape = Shape.UNDER_BEACON;
+        public int minTier = 4;
+        public int range = 200;
+        public boolean produceThunderOnBeaconActivation = true;
+        public boolean produceParticlesBoarder = true;
+        public boolean produceParticlesAtBeacon = true;
+        public boolean allowRaiderEntities = true;
+        public boolean allowBossEntities = true;
+        public boolean allowSpawnProofingWhileCoveredUp = true;
+        public boolean removeEntitiesWanderingIntoSpawnProofArea = true;
+        public List<? extends EntityType<?>> denylistEntities = new ArrayList<>();
+        public List<? extends EntityType<?>> allowlistEntities = new ArrayList<>();
+        public List<SpawnGroup> removeSpawnGroups = List.of(SpawnGroup.MONSTER);
+        public int particleInterval = 160;
         // Particle interval
 
         public enum Shape {
@@ -257,7 +257,7 @@ public class BanishmentConfig {
             CENTRE_COLUMN("CENTRE_COLUMN"), // Full column down to minTier
             FULL_BASE("FULL_BASE"); // All blocks
 
-            private String name;
+            private final String name;
             Shape(String name) {
                 this.name = name;
             }
