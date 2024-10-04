@@ -4,8 +4,8 @@ import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
 
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
@@ -176,7 +176,7 @@ public class BeaconBlockEntityHandler {
         produceAdHocParticlesAtPos(world, pos, ParticleTypes.WHITE_ASH);
     }
 
-    public static void produceAdHocParticlesAtPos(World world, BlockPos pos, DefaultParticleType parameters) {
+    public static void produceAdHocParticlesAtPos(World world, BlockPos pos, SimpleParticleType parameters) {
         if (world.isClient)
             return;
 
@@ -207,7 +207,7 @@ public class BeaconBlockEntityHandler {
             5);
     }
 
-    private static void produceBoarderParticles(World world, BlockPos pos, DefaultParticleType particleType) {
+    private static void produceBoarderParticles(World world, BlockPos pos, SimpleParticleType particleType) {
         var x = pos.getX();
         var y = 0;
         var z = pos.getZ();

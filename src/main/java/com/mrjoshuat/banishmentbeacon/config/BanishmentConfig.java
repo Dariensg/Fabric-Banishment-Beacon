@@ -82,6 +82,7 @@ public class BanishmentConfig {
             var allowBossEntities = prop.getProperty("allowBossEntities", String.valueOf(true));
             var removeEntitiesWanderingIntoSpawnProofArea = prop.getProperty("removeEntitiesWanderingIntoSpawnProofArea", String.valueOf(true));
             var allowSpawnProofingWhileCoveredUp = prop.getProperty("allowSpawnProofingWhileCoveredUp", String.valueOf(true));
+            var giveHasteEffect = prop.getProperty("giveHasteEffect", String.valueOf(true));
 
             var blockIdentifier = Identifier.tryParse(blockStr);
             if (blockIdentifier == null) {
@@ -165,6 +166,7 @@ public class BanishmentConfig {
             PROPERTIES.allowBossEntities = Boolean.parseBoolean(allowBossEntities);
             PROPERTIES.removeEntitiesWanderingIntoSpawnProofArea = Boolean.parseBoolean(removeEntitiesWanderingIntoSpawnProofArea);
             PROPERTIES.allowSpawnProofingWhileCoveredUp = Boolean.parseBoolean(allowSpawnProofingWhileCoveredUp);
+            PROPERTIES.giveHasteEffect = Boolean.parseBoolean(giveHasteEffect);
         }
         catch (Exception ex) {
             ModInit.LOGGER.error("Could not read config from file", ex);
@@ -191,6 +193,7 @@ public class BanishmentConfig {
         prop.setProperty("allowRaiderEntities", String.valueOf(PROPERTIES.allowRaiderEntities));
         prop.setProperty("removeEntitiesWanderingIntoSpawnProofArea", String.valueOf(PROPERTIES.removeEntitiesWanderingIntoSpawnProofArea));
         prop.setProperty("allowSpawnProofingWhileCoveredUp", String.valueOf(PROPERTIES.allowSpawnProofingWhileCoveredUp));
+        prop.setProperty("giveHasteEffect", String.valueOf(PROPERTIES.giveHasteEffect));
         prop.store(writer, "");
     }
 
@@ -250,6 +253,8 @@ public class BanishmentConfig {
         public List<SpawnGroup> removeSpawnGroups = List.of(SpawnGroup.MONSTER);
         public int particleInterval = 160;
         // Particle interval
+
+        public boolean giveHasteEffect = true;
 
         public enum Shape {
             UNDER_BEACON("UNDER_BEACON"), // Just 1 block under beacon

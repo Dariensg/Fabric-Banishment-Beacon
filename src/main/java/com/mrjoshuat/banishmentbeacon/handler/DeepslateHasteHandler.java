@@ -1,5 +1,6 @@
 package com.mrjoshuat.banishmentbeacon.handler;
 
+import com.mrjoshuat.banishmentbeacon.config.BanishmentConfig;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -12,6 +13,8 @@ import net.minecraft.util.math.Direction;
 
 public class DeepslateHasteHandler {
     public static void addHasteToNetheritePickOnDeepslate(ServerPlayerEntity player, ServerWorld world, BlockPos pos, PlayerActionC2SPacket.Action action, Direction direction, int worldHeight) {
+        if (!BanishmentConfig.PROPERTIES.giveHasteEffect) return;
+
         var hasHaste = player.getStatusEffect(StatusEffects.HASTE);
         // Check player hasn't already got haste 3, i.e haste 2 from a beacon
         if (hasHaste != null && hasHaste.getAmplifier() == 3) {
