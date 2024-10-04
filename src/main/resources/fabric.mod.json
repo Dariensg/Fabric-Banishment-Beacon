@@ -6,7 +6,8 @@
   "name": "Banishment Beacons",
   "description": "Highly configurable spawn proofing beacons. Because no one likes hostile mobs really",
   "authors": [
-    "MrJoshuaT"
+    "MrJoshuaT",
+    "HellionGames"
   ],
   "contact": {
     "homepage": "https://github.com/MrJoshuaT/Fabric-Banishment-Beacon/",
